@@ -1,0 +1,9 @@
+
+/build/
+/node/
+/node_modules/
+/logs/
+/.idea/
+/1/da.txt
+/target/
+.vscode/
