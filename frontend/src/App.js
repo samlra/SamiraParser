@@ -78,17 +78,28 @@ function App() {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('requirements', JSON.stringify({ requirements: validRequirements }));
-
+    
+    // Convert requirements to a JSON string
+    const requirementsJson = JSON.stringify(validRequirements.map(req => ({ text: req })));
+    
     try {
-      const response = await axios.post('http://localhost:8000/analyze-cv', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
+      const response = await axios.post(
+        `http://localhost:8000/analyze-cv?requirements=${encodeURIComponent(requirementsJson)}`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          }
         }
-      });
+      );
       setResults(response.data);
     } catch (error) {
-      setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+      console.error('Error details:', error);
+      if (error.response?.data?.detail) {
+        setError(`Fehler: ${error.response.data.detail}`);
+      } else {
+        setError('Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.');
+      }
     } finally {
       setLoading(false);
     }
@@ -194,7 +205,7 @@ function App() {
                 Detaillierte Übereinstimmungen:
               </Typography>
               <List>
-                {results.detailed_matches.map((match, index) => (
+                {results.requirement_scores.map((match, index) => (
                   <ListItem key={index}>
                     <ListItemText
                       primary={match.requirement}
@@ -209,6 +220,19 @@ function App() {
                   </ListItem>
                 ))}
               </List>
+
+              {results.cv_text && (
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle1" gutterBottom>
+                    Extrahierter Text (Ausschnitt):
+                  </Typography>
+                  <Paper elevation={1} sx={{ p: 2 }}>
+                    <Typography variant="body2">
+                      {results.cv_text}
+                    </Typography>
+                  </Paper>
+                </Box>
+              )}
             </Box>
           )}
         </Paper>
