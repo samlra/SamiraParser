@@ -18,6 +18,12 @@ import {
   alpha,
   IconButton,
   CssBaseline,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Grid,
+  Stack,
 } from '@mui/material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { UploadFile, Add as AddIcon, Delete as DeleteIcon, DarkMode, LightMode } from '@mui/icons-material';
@@ -26,90 +32,145 @@ import axios from 'axios';
 // Predefined requirements for different roles
 const jobRoleRequirements = {
   developer: [
-    "Erfahrung mit modernen Programmiersprachen (z.B. Python, Java, JavaScript)",
-    "Kenntnisse in Webtechnologien (HTML, CSS, React/Angular)",
-    "Verständnis von Datenbanken und SQL",
-    "Erfahrung mit Git und CI/CD",
-    "Agile Entwicklungsmethoden"
+    "ABAP / ABAP OO Kenntnisse",
+    "SAP IDEX-Prozesse",
+    "SAP IS-U",
+    "SAPUI5-Erfahrung",
+    "Kenntnisse in agilen Methoden",
+    "Erfahrung in der Versorgungsbranche",
+    "Sehr gute Deutsch- und Englischkenntnisse",
+    "Hochschulabschluss in Bereichen Wirtschaftsinformatik, Informatik oder Ingenieurswissenschaft oder vergleichbare Erfahrung",
+    "Analytisches Denkvermögen",
+    "Erfahrung in der Entwicklung von Schnittstellen",
+    "SAP Common Layer, Business Workflow Framework",
+    "Solution-Architektur-Kenntnisse"
   ],
   consultant: [
-    "Ausgeprägte analytische Fähigkeiten",
-    "Exzellente Kommunikationsfähigkeiten",
-    "Projektmanagement-Erfahrung",
-    "Präsentationsfähigkeiten",
-    "Branchenkenntnisse"
-  ],
-  dataScientist: [
-    "Erfahrung mit Python und R",
-    "Machine Learning Kenntnisse",
-    "Statistik und Mathematik",
-    "Data Visualization",
-    "Big Data Technologien"
+    "Erfahrung mit Energieversorgungsunternehmen und Digitalisierung der Energiewende",
+    "Kenntnisse in Regelwerken des Energiemarkts (BDEW, BNetzA, BSI, iMS, GPKE, GeLi, WiM, GWA, EMT, edi@energy, SM-PKI)",
+    "Erfahrung mit SAP IS-U oder SAP S/4HANA Utilities",
+    "Erfahrung in der Modellierung, Optimierung und Umsetzung energiewirtschaftlicher Geschäftsprozesse",
+    "Kenntnisse in SAP for Energy & Utilities",
+    "Erfahrung in Kundenberatung & Prozessoptimierung",
+    "Fähigkeit zur Analyse & Weiterentwicklung von Geschäftsprozessen",
+    "Durchführung von Kundenworkshops & Schulungen",
+    "Hochschulabschluss in Ingenieurwissenschaften, Wirtschaft, Naturwissenschaften oder Informatik",
+    "Erfahrung in Beratung oder Projekten in der Energiewirtschaft",
+    "Erfolgreiche Umsetzung von Kundenprojekten in der Branche",
+    "Hohe Kunden- und Serviceorientierung",
+    "Proaktives & innovatives Handeln",
+    "Kommunikationsstärke & Teamfähigkeit",
+    "Motivation & Leidenschaft für die Aufgabe",
+    "Sehr gute Deutsch- und Englischkenntnisse in Wort und Schrift",
+    "Erfahrung in Software-Architektur, Solution Design & SOA",
+    "Kenntnisse über IT-Systeme in der Cloud & On-Premise",
+    "Mitwirkung bei Reorganisation & Restrukturierung von Energieversorgern",
+    "Identifikation von Effizienzpotenzialen"
   ],
   projectManager: [
-    "Projektmanagement-Zertifizierungen",
-    "Führungserfahrung",
-    "Stakeholder Management",
-    "Risikomanagement",
-    "Budgetierung und Ressourcenplanung"
+    "Erfahrung in der Leitung & Steuerung von SAP-Projekten (ECC und/oder S/4)",
+    "Planung, Durchführung und Überwachung von Projekten hinsichtlich Zeit, Kosten und Qualität",
+    "Koordination und Führung interdisziplinärer Projektteams",
+    "Ansprechpartner für Kunden & Stakeholder im Projektverlauf",
+    "Geschäftsprozessanalyse & Optimierung in der Energie- und Versorgungswirtschaft",
+    "Kenntnisse über Regelwerke & Marktprozesse in der Energiewirtschaft",
+    "Erfahrung mit SAP IS-U bzw. SAP S/4 Utilities",
+    "Erfahrung mit agilen & klassischen Projektmanagement-Methoden (Scrum, Wasserfall, Prince2)",
+    "Durchführung von Workshops & Schulungen für Anwender & Key-User",
+    "Unterstützung bei der Akquisition & Angebotsvorbereitung für neue Projekte",
+    "Hochschulabschluss in Wirtschaft, Naturwissenschaften, Ingenieurwissenschaften oder Informatik",
+    "Mehrjährige Erfahrung in der Leitung von SAP-Projekten im Bereich Utilities / Energiewirtschaft",
+    "Fundierte Kenntnisse in SAP ECC bzw. SAP IS-U und/oder S/4 Utilities",
+    "Kommunikationsstärke & Stakeholder-Management",
+    "Kunden- & Serviceorientierung",
+    "Analytisches Denkvermögen & Innovationskraft",
+    "Führungskompetenz & Teamfähigkeit",
+    "Motivation & Leidenschaft für die Aufgabe",
+    "Eigenverantwortliches & strukturiertes Arbeiten",
+    "Sehr gute Deutschkenntnisse (verhandlungssicher)",
+    "Erfahrung mit SAP-Architektur & Schnittstellen",
+    "Erfahrung mit SAP S/4HANA Implementierungen & Migrationsprojekten",
+    "Kenntnisse über Cloud- & On-Premise-Lösungen in SAP-Projekten",
+    "Zertifizierungen wie Scrum Master, Product Owner, PMP oder Prince2"
   ]
 };
 
-// Remove particles config and keep only the theme configuration
+// Update the theme configuration
 const getDesignTokens = (mode) => ({
   palette: {
     mode,
     primary: {
-      main: '#9c27b0',
-      light: '#ba68c8',
-      dark: '#7b1fa2',
+      main: '#1e8449', // Rich emerald green
+      light: '#27ae60',
+      dark: '#145a32',
     },
     secondary: {
-      main: '#4caf50',
-      light: '#81c784',
-      dark: '#388e3c',
+      main: '#8e44ad', // Deep purple
+      light: '#9b59b6',
+      dark: '#6c3483',
     },
     background: {
-      default: mode === 'light' ? '#ffffff' : '#1a1a1a',
-      paper: mode === 'light' ? '#ffffff' : '#242424',
+      default: mode === 'light' ? '#f8f9fa' : '#0a0c0d',
+      paper: mode === 'light' ? '#ffffff' : '#1a1c1e',
     },
     text: {
-      primary: mode === 'light' ? '#000000' : '#ffffff',
-      secondary: mode === 'light' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
+      primary: mode === 'light' ? '#2c3e50' : '#ecf0f1',
+      secondary: mode === 'light' ? 'rgba(44, 62, 80, 0.7)' : 'rgba(236, 240, 241, 0.7)',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
-      fontWeight: 300,
-      color: mode === 'light' ? '#000000' : '#ffffff',
-      letterSpacing: '0.2em',
-      textTransform: 'uppercase',
+      fontWeight: 600,
+      letterSpacing: '0.1em',
+      background: mode === 'light' 
+        ? 'linear-gradient(45deg, #1e8449 30%, #8e44ad 90%)'
+        : 'linear-gradient(45deg, #27ae60 30%, #9b59b6 90%)',
+      backgroundClip: 'text',
+      WebkitBackgroundClip: 'text',
+      WebkitTextFillColor: 'transparent',
+      textShadow: '0 2px 4px rgba(0,0,0,0.1)',
     },
     h6: {
-      fontWeight: 300,
-      color: '#9c27b0',
-      letterSpacing: '0.1em',
+      fontWeight: 500,
+      letterSpacing: '0.05em',
+      color: mode === 'light' ? '#1e8449' : '#27ae60',
+    },
+    subtitle1: {
+      letterSpacing: '0.04em',
+    },
+    body1: {
+      letterSpacing: '0.02em',
     },
   },
   components: {
+    MuiContainer: {
+      styleOverrides: {
+        maxWidthLg: {
+          maxWidth: '1440px !important',
+          padding: '0 32px',
+        },
+      },
+    },
     MuiPaper: {
       styleOverrides: {
         root: {
           backgroundImage: 'none',
-          backgroundColor: mode === 'light' ? '#ffffff' : '#242424',
-          backdropFilter: 'none',
-          border: mode === 'light' 
-            ? '1px solid rgba(0, 0, 0, 0.1)'
-            : '1px solid rgba(255, 255, 255, 0.1)',
-          transition: 'all 0.3s ease-in-out',
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1a1c1e',
+          backdropFilter: mode === 'light' ? 'blur(20px)' : 'blur(10px)',
+          border: (theme) => `1px solid ${
+            theme.palette.mode === 'light' 
+              ? 'rgba(30, 132, 73, 0.1)'
+              : 'rgba(39, 174, 96, 0.1)'
+          }`,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            border: mode === 'light'
-              ? '1px solid rgba(0, 0, 0, 0.2)'
-              : '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: mode === 'light'
-              ? 'none'
-              : '0 0 20px rgba(0, 0, 0, 0.2)',
+            transform: 'translateY(-4px)',
+            boxShadow: (theme) => `0 16px 48px ${
+              theme.palette.mode === 'light'
+                ? 'rgba(30, 132, 73, 0.12)'
+                : 'rgba(39, 174, 96, 0.12)'
+            }`,
           },
         },
       },
@@ -117,28 +178,39 @@ const getDesignTokens = (mode) => ({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 4,
+          borderRadius: 12,
           textTransform: 'none',
           fontWeight: 500,
           letterSpacing: '0.05em',
-          padding: '8px 16px',
-          transition: 'all 0.3s ease-in-out',
+          padding: '12px 28px',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            transform: 'translateY(-2px)',
-            boxShadow: mode === 'light' 
-              ? '0 4px 20px rgba(0, 0, 0, 0.1)'
-              : '0 4px 20px rgba(156, 39, 176, 0.4)',
+            boxShadow: '0 4px 16px rgba(30, 132, 73, 0.2)',
           },
         },
         contained: {
           background: mode === 'light'
-            ? '#9c27b0'
-            : 'linear-gradient(45deg, #9c27b0 30%, #ba68c8 90%)',
+            ? 'linear-gradient(45deg, #1e8449 30%, #8e44ad 90%)'
+            : 'linear-gradient(45deg, #27ae60 30%, #9b59b6 90%)',
           color: '#ffffff',
+          boxShadow: '0 4px 16px rgba(30, 132, 73, 0.2)',
           '&:hover': {
             background: mode === 'light'
-              ? '#7b1fa2'
-              : 'linear-gradient(45deg, #ba68c8 30%, #9c27b0 90%)',
+              ? 'linear-gradient(45deg, #145a32 30%, #6c3483 90%)'
+              : 'linear-gradient(45deg, #1e8449 30%, #8e44ad 90%)',
+            boxShadow: '0 8px 32px rgba(30, 132, 73, 0.3)',
+          },
+        },
+        outlined: {
+          borderColor: mode === 'light' ? '#1e8449' : '#27ae60',
+          borderWidth: '2px',
+          color: mode === 'light' ? '#1e8449' : '#27ae60',
+          '&:hover': {
+            borderColor: mode === 'light' ? '#27ae60' : '#2ecc71',
+            backgroundColor: mode === 'light' 
+              ? 'rgba(30, 132, 73, 0.08)'
+              : 'rgba(39, 174, 96, 0.08)',
+            boxShadow: '0 4px 16px rgba(30, 132, 73, 0.15)',
           },
         },
       },
@@ -147,22 +219,14 @@ const getDesignTokens = (mode) => ({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            backgroundColor: mode === 'light' ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
-            '& fieldset': {
-              borderColor: mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.15)',
+            borderRadius: 12,
+            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+            '&:hover': {
+              boxShadow: '0 4px 16px rgba(30, 132, 73, 0.1)',
             },
-            '&:hover fieldset': {
-              borderColor: mode === 'light' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.25)',
+            '&.Mui-focused': {
+              boxShadow: '0 8px 32px rgba(30, 132, 73, 0.15)',
             },
-            '&.Mui-focused fieldset': {
-              borderColor: '#9c27b0',
-            },
-          },
-          '& .MuiInputLabel-root': {
-            color: mode === 'light' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.7)',
-          },
-          '& .MuiInputBase-input': {
-            color: mode === 'light' ? '#000000' : '#ffffff',
           },
         },
       },
@@ -170,24 +234,38 @@ const getDesignTokens = (mode) => ({
     MuiChip: {
       styleOverrides: {
         root: {
-          backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)',
-          border: mode === 'light' ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
-          color: mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#ffffff',
+          borderRadius: 8,
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.08)',
+            transform: 'translateY(-1px)',
+            boxShadow: '0 4px 12px rgba(30, 132, 73, 0.1)',
           },
+        },
+        outlined: {
+          borderWidth: '2px',
         },
       },
     },
-    MuiCssBaseline: {
+    MuiAlert: {
       styleOverrides: {
-        body: {
-          backgroundColor: mode === 'light' ? '#ffffff' : '#1a1a1a',
-          backgroundImage: 'none',
+        root: {
+          borderRadius: 12,
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.1)',
         },
       },
     },
   },
+  shape: {
+    borderRadius: 12,
+  },
+  shadows: [
+    'none',
+    '0 2px 4px rgba(0,0,0,0.05)',
+    '0 4px 8px rgba(0,0,0,0.05)',
+    '0 8px 16px rgba(0,0,0,0.05)',
+    '0 16px 32px rgba(0,0,0,0.05)',
+    // ... rest of the shadows array
+  ],
 });
 
 function JobRoleTab({ value, index, children }) {
@@ -211,27 +289,20 @@ function App() {
   const [mode, setMode] = useState('light');
   const theme = React.useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
   const [file, setFile] = useState(null);
-  const [requirements, setRequirements] = useState(['']);
+  const [requirements, setRequirements] = useState(jobRoleRequirements.developer);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
-  const [selectedTab, setSelectedTab] = useState(0);
   const [selectedRole, setSelectedRole] = useState('developer');
 
   const toggleColorMode = () => {
     setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
   };
 
-  const handleTabChange = (event, newValue) => {
-    setSelectedTab(newValue);
-    // Load predefined requirements based on selected role
-    const roleRequirements = {
-      0: jobRoleRequirements.developer,
-      1: jobRoleRequirements.consultant,
-      2: jobRoleRequirements.dataScientist,
-      3: jobRoleRequirements.projectManager,
-    }[newValue] || [];
-    setRequirements(roleRequirements);
+  const handleRoleChange = (event) => {
+    const role = event.target.value;
+    setSelectedRole(role);
+    setRequirements(jobRoleRequirements[role]);
   };
 
   const handleFileChange = (event) => {
@@ -279,7 +350,6 @@ function App() {
     const formData = new FormData();
     formData.append('file', file);
     
-    // Convert requirements to a JSON string
     const requirementsJson = JSON.stringify(validRequirements.map(req => ({ text: req })));
     
     try {
@@ -315,952 +385,563 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Container maxWidth="md" sx={{ py: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-          <IconButton onClick={toggleColorMode} color="inherit">
+      <Container maxWidth="lg" sx={{ 
+        py: 6, 
+        px: { xs: 2, sm: 3, md: 4 },
+        '@media (min-width: 1200px)': {
+          px: 6,
+        },
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+          <Typography 
+            variant="h4" 
+            component="h1"
+            sx={{
+              background: 'linear-gradient(45deg, #2e7d32, #7b1fa2)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              textShadow: '0 2px 4px rgba(0,0,0,0.1)',
+            }}
+          >
+            SAP CV-Analyse für Energiewirtschaft
+          </Typography>
+          <IconButton onClick={toggleColorMode} color="inherit" sx={{ ml: 2 }}>
             {mode === 'dark' ? <LightMode /> : <DarkMode />}
           </IconButton>
         </Box>
-        <Paper 
-          elevation={3} 
-          sx={{ 
-            p: 4,
-            position: 'relative',
-            backgroundColor: mode === 'light' ? '#ffffff' : 'rgba(20, 20, 20, 0.8)',
-            backdropFilter: mode === 'light' ? 'none' : 'blur(10px)',
-            border: mode === 'light' 
-              ? '1px solid rgba(0, 0, 0, 0.1)'
-              : '1px solid rgba(156, 39, 176, 0.1)',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              height: '1px',
-              background: mode === 'light'
-                ? 'linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent)'
-                : 'linear-gradient(90deg, transparent, rgba(156, 39, 176, 0.5), transparent)',
-            },
-          }}
-        >
-          <Typography 
-            variant="h4" 
-            component="h1" 
-            gutterBottom 
-            align="center" 
-            sx={{ 
-              mb: 4,
-              background: 'linear-gradient(45deg, #9c27b0, #ff9800)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              animation: 'glow 2s ease-in-out infinite alternate',
-              '@keyframes glow': {
-                '0%': {
-                  textShadow: '0 0 10px rgba(156, 39, 176, 0.3)',
-                },
-                '100%': {
-                  textShadow: '0 0 20px rgba(255, 152, 0, 0.5)',
-                },
-              },
-            }}
-          >
-            CV-Analyse & Bewertung
-          </Typography>
 
-          <Tabs
-            value={selectedTab}
-            onChange={handleTabChange}
-            variant="fullWidth"
-            sx={{
-              mb: 3,
-              '& .MuiTab-root': {
-                minWidth: 120,
-                fontWeight: 500,
-                transition: 'all 0.3s ease-in-out',
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={4}>
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 4,
+                height: '100%',
+                background: (theme) => theme.palette.mode === 'light'
+                  ? 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95))'
+                  : 'linear-gradient(135deg, rgba(26,28,30,0.9), rgba(26,28,30,0.95))',
+                backdropFilter: 'blur(20px)',
+                border: (theme) => `1px solid ${
+                  theme.palette.mode === 'light' 
+                    ? 'rgba(30, 132, 73, 0.1)'
+                    : 'rgba(39, 174, 96, 0.1)'
+                }`,
+                borderRadius: 3,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  transform: 'translateY(-2px)',
+                  transform: 'translateY(-4px)',
+                  boxShadow: (theme) => `0 16px 48px ${
+                    theme.palette.mode === 'light'
+                      ? 'rgba(30, 132, 73, 0.12)'
+                      : 'rgba(39, 174, 96, 0.12)'
+                  }`,
                 },
-              },
-              '& .Mui-selected': {
-                color: 'primary.main',
-              },
-              '& .MuiTabs-indicator': {
-                backgroundColor: 'primary.main',
-                height: 3,
-                borderRadius: 1.5,
-              },
-            }}
-          >
-            <Tab label="Software Entwickler" id="tab-0" aria-controls="tabpanel-0" />
-            <Tab label="Consultant" id="tab-1" aria-controls="tabpanel-1" />
-            <Tab label="Data Scientist" id="tab-2" aria-controls="tabpanel-2" />
-            <Tab label="Projektmanager" id="tab-3" aria-controls="tabpanel-3" />
-          </Tabs>
+              }}
+            >
+              <Stack spacing={2}>
+                <Typography variant="h6" gutterBottom>
+                  Position auswählen
+                </Typography>
+                <Button
+                  variant={selectedRole === 'developer' ? 'contained' : 'outlined'}
+                  onClick={() => handleRoleChange({ target: { value: 'developer' }})}
+                  fullWidth
+                  size="large"
+                >
+                  SAP Entwickler
+                </Button>
+                <Button
+                  variant={selectedRole === 'consultant' ? 'contained' : 'outlined'}
+                  onClick={() => handleRoleChange({ target: { value: 'consultant' }})}
+                  fullWidth
+                  size="large"
+                >
+                  SAP Consultant
+                </Button>
+                <Button
+                  variant={selectedRole === 'projectManager' ? 'contained' : 'outlined'}
+                  onClick={() => handleRoleChange({ target: { value: 'projectManager' }})}
+                  fullWidth
+                  size="large"
+                >
+                  SAP Projektleiter
+                </Button>
 
-          <JobRoleTab value={selectedTab} index={0}>
-            <Box>
-              <Box sx={{ mb: 4 }}>
-                <input
-                  accept="application/pdf"
-                  style={{ display: 'none' }}
-                  id="cv-file-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="cv-file-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<UploadFile />}
-                    fullWidth
-                    sx={{
-                      background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                      color: 'white',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                      },
-                      transition: 'all 0.3s ease-in-out',
-                    }}
-                  >
-                    PDF-Lebenslauf hochladen
-                  </Button>
-                </label>
-                {file && (
-                  <Typography variant="body2" sx={{ mt: 1, color: 'primary.main' }}>
-                    Ausgewählte Datei: {file.name}
-                  </Typography>
-                )}
-              </Box>
+                <Box sx={{ mt: 4 }}>
+                  <input
+                    accept="application/pdf"
+                    style={{ display: 'none' }}
+                    id="cv-file-upload"
+                    type="file"
+                    onChange={handleFileChange}
+                  />
+                  <label htmlFor="cv-file-upload">
+                    <Button
+                      variant="contained"
+                      component="span"
+                      startIcon={<UploadFile />}
+                      fullWidth
+                      size="large"
+                    >
+                      PDF-Lebenslauf hochladen
+                    </Button>
+                  </label>
+                  {file && (
+                    <Typography variant="body2" sx={{ mt: 1, color: 'primary.main' }}>
+                      Ausgewählte Datei: {file.name}
+                    </Typography>
+                  )}
+                </Box>
+              </Stack>
+            </Paper>
+          </Grid>
 
-              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                Stellenanforderungen
+          <Grid item xs={12} md={8}>
+            <Paper 
+              elevation={0} 
+              sx={{ 
+                p: 4,
+                height: '100%',
+                background: (theme) => theme.palette.mode === 'light'
+                  ? 'linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95))'
+                  : 'linear-gradient(135deg, rgba(26,28,30,0.9), rgba(26,28,30,0.95))',
+                backdropFilter: 'blur(20px)',
+                border: (theme) => `1px solid ${
+                  theme.palette.mode === 'light' 
+                    ? 'rgba(30, 132, 73, 0.1)'
+                    : 'rgba(39, 174, 96, 0.1)'
+                }`,
+                borderRadius: 3,
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: (theme) => `0 16px 48px ${
+                    theme.palette.mode === 'light'
+                      ? 'rgba(30, 132, 73, 0.12)'
+                      : 'rgba(39, 174, 96, 0.12)'
+                  }`,
+                },
+              }}
+            >
+              <Typography variant="h6" gutterBottom>
+                Stellenanforderungen für {selectedRole === 'developer' ? 'SAP Entwickler' : 
+                                        selectedRole === 'consultant' ? 'SAP Consultant' : 
+                                        'SAP Projektleiter'}
               </Typography>
 
-              <List sx={{ mt: 2 }}>
-                {requirements.map((req, index) => (
-                  <ListItem 
-                    key={index} 
-                    sx={{ 
-                      px: 0,
-                      mb: 2,
-                      '&:hover': {
-                        '& .MuiButton-root': {
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label={`Anforderung ${index + 1}`}
-                      value={req}
-                      onChange={(e) => handleRequirementChange(index, e.target.value)}
-                      variant="outlined"
-                      sx={{
-                        mr: 1,
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': {
-                            borderColor: 'primary.light',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'primary.main',
-                          },
-                        },
-                      }}
-                    />
-                    {index > 0 && (
-                      <Button
-                        color="error"
-                        onClick={() => removeRequirement(index)}
-                        startIcon={<DeleteIcon />}
-                        sx={{
-                          opacity: 0.7,
-                          transition: 'opacity 0.2s',
-                        }}
-                      >
-                        Entfernen
-                      </Button>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addRequirement}
+              <TextField
+                fullWidth
+                multiline
+                rows={15}
+                value={requirements.join('\n')}
+                onChange={(e) => setRequirements(e.target.value.split('\n').filter(req => req.trim() !== ''))}
+                variant="outlined"
                 sx={{
-                  mt: 2,
-                  color: 'secondary.main',
-                  borderColor: 'secondary.main',
-                  '&:hover': {
-                    borderColor: 'secondary.dark',
-                    backgroundColor: 'rgba(255, 152, 0, 0.04)',
+                  mb: 3,
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: (theme) => theme.palette.mode === 'light' 
+                      ? 'rgba(30, 132, 73, 0.02)'
+                      : 'rgba(39, 174, 96, 0.02)',
+                    backdropFilter: 'blur(20px)',
+                    borderRadius: 3,
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    '&:hover': {
+                      backgroundColor: (theme) => theme.palette.mode === 'light' 
+                        ? 'rgba(30, 132, 73, 0.05)'
+                        : 'rgba(39, 174, 96, 0.05)',
+                      boxShadow: '0 8px 32px rgba(30, 132, 73, 0.1)',
+                    },
+                    '&.Mui-focused': {
+                      backgroundColor: (theme) => theme.palette.mode === 'light' 
+                        ? 'rgba(30, 132, 73, 0.08)'
+                        : 'rgba(39, 174, 96, 0.08)',
+                      boxShadow: '0 16px 48px rgba(30, 132, 73, 0.15)',
+                    },
                   },
                 }}
-                variant="outlined"
-              >
-                Anforderung hinzufügen
-              </Button>
+              />
 
               {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                sx={{
-                  mt: 4,
-                  background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                  color: 'white',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                  },
-                  transition: 'all 0.3s ease-in-out',
-                }}
-                fullWidth
-              >
-                {loading ? <CircularProgress size={24} /> : 'Analyse starten'}
-              </Button>
-            </Box>
-          </JobRoleTab>
-
-          <JobRoleTab value={selectedTab} index={1}>
-            <Box>
-              <Box sx={{ mb: 4 }}>
-                <input
-                  accept="application/pdf"
-                  style={{ display: 'none' }}
-                  id="consultant-cv-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="consultant-cv-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<UploadFile />}
-                    fullWidth
-                    sx={{
-                      background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                      color: 'white',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                      },
-                      transition: 'all 0.3s ease-in-out',
-                    }}
-                  >
-                    PDF-Lebenslauf hochladen
-                  </Button>
-                </label>
-                {file && (
-                  <Typography variant="body2" sx={{ mt: 1, color: 'primary.main' }}>
-                    Ausgewählte Datei: {file.name}
-                  </Typography>
-                )}
-              </Box>
-
-              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                Stellenanforderungen
-              </Typography>
-
-              <List sx={{ mt: 2 }}>
-                {requirements.map((req, index) => (
-                  <ListItem 
-                    key={index} 
-                    sx={{ 
-                      px: 0,
-                      mb: 2,
-                      '&:hover': {
-                        '& .MuiButton-root': {
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label={`Anforderung ${index + 1}`}
-                      value={req}
-                      onChange={(e) => handleRequirementChange(index, e.target.value)}
-                      variant="outlined"
-                      sx={{
-                        mr: 1,
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': {
-                            borderColor: 'primary.light',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'primary.main',
-                          },
-                        },
-                      }}
-                    />
-                    {index > 0 && (
-                      <Button
-                        color="error"
-                        onClick={() => removeRequirement(index)}
-                        startIcon={<DeleteIcon />}
-                        sx={{
-                          opacity: 0.7,
-                          transition: 'opacity 0.2s',
-                        }}
-                      >
-                        Entfernen
-                      </Button>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addRequirement}
-                sx={{
-                  mt: 2,
-                  color: 'secondary.main',
-                  borderColor: 'secondary.main',
-                  '&:hover': {
-                    borderColor: 'secondary.dark',
-                    backgroundColor: 'rgba(255, 152, 0, 0.04)',
-                  },
-                }}
-                variant="outlined"
-              >
-                Anforderung hinzufügen
-              </Button>
-
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                sx={{
-                  mt: 4,
-                  background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                  color: 'white',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                  },
-                  transition: 'all 0.3s ease-in-out',
-                }}
-                fullWidth
-              >
-                {loading ? <CircularProgress size={24} /> : 'Analyse starten'}
-              </Button>
-            </Box>
-          </JobRoleTab>
-
-          <JobRoleTab value={selectedTab} index={2}>
-            <Box>
-              <Box sx={{ mb: 4 }}>
-                <input
-                  accept="application/pdf"
-                  style={{ display: 'none' }}
-                  id="data-scientist-cv-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="data-scientist-cv-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<UploadFile />}
-                    fullWidth
-                    sx={{
-                      background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                      color: 'white',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                      },
-                      transition: 'all 0.3s ease-in-out',
-                    }}
-                  >
-                    PDF-Lebenslauf hochladen
-                  </Button>
-                </label>
-                {file && (
-                  <Typography variant="body2" sx={{ mt: 1, color: 'primary.main' }}>
-                    Ausgewählte Datei: {file.name}
-                  </Typography>
-                )}
-              </Box>
-
-              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                Stellenanforderungen
-              </Typography>
-
-              <List sx={{ mt: 2 }}>
-                {requirements.map((req, index) => (
-                  <ListItem 
-                    key={index} 
-                    sx={{ 
-                      px: 0,
-                      mb: 2,
-                      '&:hover': {
-                        '& .MuiButton-root': {
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label={`Anforderung ${index + 1}`}
-                      value={req}
-                      onChange={(e) => handleRequirementChange(index, e.target.value)}
-                      variant="outlined"
-                      sx={{
-                        mr: 1,
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': {
-                            borderColor: 'primary.light',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'primary.main',
-                          },
-                        },
-                      }}
-                    />
-                    {index > 0 && (
-                      <Button
-                        color="error"
-                        onClick={() => removeRequirement(index)}
-                        startIcon={<DeleteIcon />}
-                        sx={{
-                          opacity: 0.7,
-                          transition: 'opacity 0.2s',
-                        }}
-                      >
-                        Entfernen
-                      </Button>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addRequirement}
-                sx={{
-                  mt: 2,
-                  color: 'secondary.main',
-                  borderColor: 'secondary.main',
-                  '&:hover': {
-                    borderColor: 'secondary.dark',
-                    backgroundColor: 'rgba(255, 152, 0, 0.04)',
-                  },
-                }}
-                variant="outlined"
-              >
-                Anforderung hinzufügen
-              </Button>
-
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                sx={{
-                  mt: 4,
-                  background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                  color: 'white',
-                  '&:hover': {
-                    background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                  },
-                  transition: 'all 0.3s ease-in-out',
-                }}
-                fullWidth
-              >
-                {loading ? <CircularProgress size={24} /> : 'Analyse starten'}
-              </Button>
-            </Box>
-          </JobRoleTab>
-
-          <JobRoleTab value={selectedTab} index={3}>
-            <Box>
-              <Box sx={{ mb: 4 }}>
-                <input
-                  accept="application/pdf"
-                  style={{ display: 'none' }}
-                  id="project-manager-cv-upload"
-                  type="file"
-                  onChange={handleFileChange}
-                />
-                <label htmlFor="project-manager-cv-upload">
-                  <Button
-                    variant="contained"
-                    component="span"
-                    startIcon={<UploadFile />}
-                    fullWidth
-                    sx={{
-                      background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
-                      color: 'white',
-                      '&:hover': {
-                        background: 'linear-gradient(45deg, #7b1fa2 30%, #ffb74d 90%)',
-                        transform: 'translateY(-2px)',
-                        boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
-                      },
-                      transition: 'all 0.3s ease-in-out',
-                    }}
-                  >
-                    PDF-Lebenslauf hochladen
-                  </Button>
-                </label>
-                {file && (
-                  <Typography variant="body2" sx={{ mt: 1, color: 'primary.main' }}>
-                    Ausgewählte Datei: {file.name}
-                  </Typography>
-                )}
-              </Box>
-
-              <Typography variant="h6" gutterBottom sx={{ mt: 4 }}>
-                Stellenanforderungen
-              </Typography>
-
-              <List sx={{ mt: 2 }}>
-                {requirements.map((req, index) => (
-                  <ListItem 
-                    key={index} 
-                    sx={{ 
-                      px: 0,
-                      mb: 2,
-                      '&:hover': {
-                        '& .MuiButton-root': {
-                          opacity: 1,
-                        },
-                      },
-                    }}
-                  >
-                    <TextField
-                      fullWidth
-                      label={`Anforderung ${index + 1}`}
-                      value={req}
-                      onChange={(e) => handleRequirementChange(index, e.target.value)}
-                      variant="outlined"
-                      sx={{
-                        mr: 1,
-                        '& .MuiOutlinedInput-root': {
-                          '&:hover fieldset': {
-                            borderColor: 'primary.light',
-                          },
-                          '&.Mui-focused fieldset': {
-                            borderColor: 'primary.main',
-                          },
-                        },
-                      }}
-                    />
-                    {index > 0 && (
-                      <Button
-                        color="error"
-                        onClick={() => removeRequirement(index)}
-                        startIcon={<DeleteIcon />}
-                        sx={{
-                          opacity: 0.7,
-                          transition: 'opacity 0.2s',
-                        }}
-                      >
-                        Entfernen
-                      </Button>
-                    )}
-                  </ListItem>
-                ))}
-              </List>
-
-              <Button
-                startIcon={<AddIcon />}
-                onClick={addRequirement}
-                sx={{
-                  mt: 2,
-                  color: 'secondary.main',
-                  borderColor: 'secondary.main',
-                  '&:hover': {
-                    borderColor: 'secondary.dark',
-                    backgroundColor: 'rgba(255, 152, 0, 0.04)',
-                  },
-                }}
-                variant="outlined"
-              >
-                Anforderung hinzufügen
-              </Button>
-
-              {error && (
-                <Alert severity="error" sx={{ mt: 2 }}>
-                  {error}
-                </Alert>
-              )}
-
-              <Button
-                variant="contained"
-                onClick={handleSubmit}
-                disabled={loading}
-                sx={{
-                  mt: 4,
-                  background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main} 30%, ${theme.palette.secondary.main} 90%)`,
-                  color: 'white',
-                  '&:hover': {
-                    background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.dark} 30%, ${theme.palette.secondary.dark} 90%)`,
-                    transform: 'translateY(-2px)',
-                    boxShadow: (theme) => `0 4px 20px ${alpha(theme.palette.primary.main, 0.25)}`,
-                  },
-                  transition: 'all 0.3s ease-in-out',
-                }}
-                fullWidth
-              >
-                {loading ? <CircularProgress size={24} /> : 'Analyse starten'}
-              </Button>
-            </Box>
-          </JobRoleTab>
-
-          {/* Results section */}
-          {results && (
-            <Box sx={{ mt: 4 }}>
-              <Typography 
-                variant="h6" 
-                gutterBottom
-                sx={{
-                  background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                  backgroundClip: 'text',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  textShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`,
-                }}
-              >
-                Analyseergebnisse
-              </Typography>
-
-              {results.summary && results.summary.startsWith('Fehler') ? (
                 <Alert 
                   severity="error" 
                   sx={{ 
-                    mb: 2,
-                    backgroundColor: (theme) => theme.palette.mode === 'dark' 
-                      ? alpha(theme.palette.error.main, 0.1)
-                      : alpha(theme.palette.error.light, 0.1),
-                    color: 'error.main',
-                    border: 1,
-                    borderColor: 'error.main',
+                    mt: 2,
+                    borderRadius: 2,
                   }}
                 >
-                  {results.summary}
+                  {error}
                 </Alert>
-              ) : (
-                <>
-                  <Paper 
-                    elevation={1} 
-                    sx={{ 
-                      p: 3, 
-                      mb: 3,
-                      background: 'none',
-                      border: (theme) => `1px solid ${
-                        theme.palette.mode === 'dark' 
-                          ? 'rgba(255,255,255,0.1)' 
-                          : 'rgba(0,0,0,0.1)'
-                      }`,
-                      transition: 'transform 0.3s ease-in-out',
-                      '&:hover': {
-                        transform: 'translateY(-4px)',
-                      },
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                      <Box 
-                        sx={{ 
-                          position: 'relative', 
-                          display: 'inline-flex', 
-                          mr: 3,
-                          '&::after': {
-                            content: '""',
-                            position: 'absolute',
-                            top: -4,
-                            left: -4,
-                            right: -4,
-                            bottom: -4,
-                            borderRadius: '50%',
-                            background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+              )}
+
+              <Button
+                variant="contained"
+                onClick={handleSubmit}
+                disabled={loading}
+                size="large"
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  width: '100%',
+                }}
+              >
+                {loading ? <CircularProgress size={24} /> : 'Analyse starten'}
+              </Button>
+            </Paper>
+          </Grid>
+        </Grid>
+
+        {results && (
+          <Paper 
+            elevation={0} 
+            sx={{ 
+              mt: 3,
+              p: 3,
+              border: (theme) => `1px solid ${
+                theme.palette.mode === 'light' 
+                  ? 'rgba(46, 125, 50, 0.2)'
+                  : 'rgba(46, 125, 50, 0.1)'
+              }`,
+              borderRadius: 2,
+            }}
+          >
+            <Typography 
+              variant="h6" 
+              gutterBottom
+              sx={{
+                background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                textShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`,
+              }}
+            >
+              Analyseergebnisse
+            </Typography>
+
+            {results.summary && results.summary.startsWith('Fehler') ? (
+              <Alert 
+                severity="error" 
+                sx={{ 
+                  mb: 2,
+                  backgroundColor: (theme) => theme.palette.mode === 'dark' 
+                    ? alpha(theme.palette.error.main, 0.1)
+                    : alpha(theme.palette.error.light, 0.1),
+                  color: 'error.main',
+                  border: 1,
+                  borderColor: 'error.main',
+                }}
+              >
+                {results.summary}
+              </Alert>
+            ) : (
+              <>
+                <Paper 
+                  elevation={1} 
+                  sx={{ 
+                    p: 3, 
+                    mb: 3,
+                    background: 'none',
+                    border: (theme) => `1px solid ${
+                      theme.palette.mode === 'dark' 
+                        ? 'rgba(255,255,255,0.1)' 
+                        : 'rgba(0,0,0,0.1)'
+                    }`,
+                    transition: 'transform 0.3s ease-in-out',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                    },
+                  }}
+                >
+                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                    <Box 
+                      sx={{ 
+                        position: 'relative', 
+                        display: 'inline-flex', 
+                        mr: 3,
+                        '&::after': {
+                          content: '""',
+                          position: 'absolute',
+                          top: -4,
+                          left: -4,
+                          right: -4,
+                          bottom: -4,
+                          borderRadius: '50%',
+                          background: (theme) => `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
+                          opacity: 0.2,
+                          animation: 'pulse 2s ease-in-out infinite',
+                        },
+                        '@keyframes pulse': {
+                          '0%': {
+                            transform: 'scale(0.95)',
+                            opacity: 0.5,
+                          },
+                          '70%': {
+                            transform: 'scale(1)',
                             opacity: 0.2,
-                            animation: 'pulse 2s ease-in-out infinite',
                           },
-                          '@keyframes pulse': {
-                            '0%': {
-                              transform: 'scale(0.95)',
-                              opacity: 0.5,
-                            },
-                            '70%': {
-                              transform: 'scale(1)',
-                              opacity: 0.2,
-                            },
-                            '100%': {
-                              transform: 'scale(0.95)',
-                              opacity: 0.5,
-                            },
+                          '100%': {
+                            transform: 'scale(0.95)',
+                            opacity: 0.5,
                           },
-                        }}
-                      >
-                        <CircularProgress
-                          variant="determinate"
-                          value={results.overall_score}
-                          size={80}
-                          thickness={4}
-                          sx={{
-                            color: (theme) => results.overall_score > 70 
+                        },
+                      }}
+                    >
+                      <CircularProgress
+                        variant="determinate"
+                        value={results.overall_score}
+                        size={80}
+                        thickness={4}
+                        sx={{
+                          color: (theme) => results.overall_score > 70 
+                            ? theme.palette.success.main
+                            : results.overall_score > 40 
+                              ? theme.palette.warning.main 
+                              : theme.palette.error.main,
+                          boxShadow: (theme) => `0 0 20px ${alpha(
+                            results.overall_score > 70 
                               ? theme.palette.success.main
                               : results.overall_score > 40 
                                 ? theme.palette.warning.main 
                                 : theme.palette.error.main,
-                            boxShadow: (theme) => `0 0 20px ${alpha(
-                              results.overall_score > 70 
-                                ? theme.palette.success.main
-                                : results.overall_score > 40 
-                                  ? theme.palette.warning.main 
-                                  : theme.palette.error.main,
-                              0.3
-                            )}`,
-                          }}
-                        />
-                        <Box
-                          sx={{
-                            top: 0,
-                            left: 0,
-                            bottom: 0,
-                            right: 0,
-                            position: 'absolute',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Typography 
-                            variant="h6" 
-                            component="div" 
-                            sx={{ 
-                              color: results.overall_score > 70 ? 'success.main' : 
-                                     results.overall_score > 40 ? 'warning.main' : 'error.main',
-                              fontWeight: 'bold',
-                            }}
-                          >
-                            {`${Math.round(results.overall_score)}%`}
-                          </Typography>
-                        </Box>
-                      </Box>
-                      <Box>
-                        <Typography variant="h5" sx={{ color: 'primary.main', mb: 0.5 }}>
-                          Gesamtbewertung
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          Übereinstimmung mit dem Anforderungsprofil
-                        </Typography>
-                      </Box>
-                    </Box>
-
-                    <Typography 
-                      variant="body1" 
-                      paragraph 
-                      sx={{ 
-                        whiteSpace: 'pre-line',
-                        backgroundColor: (theme) => alpha(
-                          theme.palette.background.paper,
-                          theme.palette.mode === 'dark' ? 0.1 : 0.7
-                        ),
-                        p: 2,
-                        borderRadius: 1,
-                        border: 1,
-                        borderColor: 'divider',
-                        boxShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`,
-                      }}
-                    >
-                      {results.summary}
-                    </Typography>
-
-                    {results.key_strengths && results.key_strengths.length > 0 && (
-                      <Box sx={{ mt: 3 }}>
-                        <Typography variant="subtitle1" gutterBottom color="primary.main">
-                          Besondere Stärken:
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
-                          {results.key_strengths.map((strength, index) => (
-                            <Chip
-                              key={index}
-                              label={strength}
-                              color="success"
-                              variant="outlined"
-                              sx={{ 
-                                fontSize: '0.9rem', 
-                                py: 0.5,
-                                background: 'none',
-                                border: (theme) => `1px solid ${
-                                  theme.palette.mode === 'dark' 
-                                    ? 'rgba(255,255,255,0.1)' 
-                                    : 'rgba(0,0,0,0.1)'
-                                }`,
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </Box>
-                    )}
-
-                    {results.improvement_areas && results.improvement_areas.length > 0 && (
-                      <Box sx={{ mt: 3 }}>
-                        <Typography variant="subtitle1" gutterBottom color="secondary.main">
-                          Entwicklungspotenzial:
-                        </Typography>
-                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                          {results.improvement_areas.map((area, index) => (
-                            <Chip
-                              key={index}
-                              label={area}
-                              color="secondary"
-                              variant="outlined"
-                              sx={{ 
-                                fontSize: '0.9rem', 
-                                py: 0.5,
-                                background: 'none',
-                                border: (theme) => `1px solid ${
-                                  theme.palette.mode === 'dark' 
-                                    ? 'rgba(255,255,255,0.1)' 
-                                    : 'rgba(0,0,0,0.1)'
-                                }`,
-                              }}
-                            />
-                          ))}
-                        </Box>
-                      </Box>
-                    )}
-                  </Paper>
-
-                  {results.requirement_matches && results.requirement_matches.length > 0 && (
-                    <>
-                      <Typography variant="h6" gutterBottom color="primary.main">
-                        Detaillierte Analyse der Anforderungen:
-                      </Typography>
-                      <List>
-                        {results.requirement_matches.map((match, index) => (
-                          <ListItem key={index} sx={{ px: 0, mb: 2 }}>
-                            <Paper 
-                              elevation={1} 
-                              sx={{ 
-                                p: 2, 
-                                width: '100%',
-                                background: 'none',
-                                border: (theme) => `1px solid ${
-                                  theme.palette.mode === 'dark' 
-                                    ? 'rgba(255,255,255,0.1)' 
-                                    : 'rgba(0,0,0,0.1)'
-                                }`,
-                                transition: 'transform 0.2s',
-                                '&:hover': {
-                                  transform: 'translateY(-2px)',
-                                },
-                              }}
-                            >
-                              <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                                <Typography 
-                                  variant="subtitle2" 
-                                  sx={{ 
-                                    flex: 1,
-                                    color: 'text.primary',
-                                    fontWeight: 500,
-                                  }}
-                                >
-                                  {match.requirement}
-                                </Typography>
-                                <Chip
-                                  label={`${match.match_percentage}%`}
-                                  color={match.match_percentage > 70 ? 'success' : 
-                                        match.match_percentage > 40 ? 'warning' : 'error'}
-                                  sx={{ 
-                                    ml: 2,
-                                    fontWeight: 'bold',
-                                    backgroundColor: match.match_percentage > 70 ? alpha('#2e7d32', 0.1) : 
-                                                  match.match_percentage > 40 ? alpha('#ed6c02', 0.1) : 
-                                                  alpha('#d32f2f', 0.1),
-                                  }}
-                                />
-                              </Box>
-                              <Typography 
-                                variant="body2" 
-                                sx={{ 
-                                  color: 'text.secondary',
-                                  whiteSpace: 'pre-line',
-                                  p: 1.5,
-                                  borderRadius: 1,
-                                  border: '1px solid',
-                                  borderColor: 'divider',
-                                }}
-                              >
-                                {match.explanation}
-                              </Typography>
-                            </Paper>
-                          </ListItem>
-                        ))}
-                      </List>
-                    </>
-                  )}
-
-                  {results.cv_text && (
-                    <Box sx={{ mt: 4 }}>
-                      <Typography variant="subtitle1" gutterBottom color="text.secondary">
-                        Extrahierter Text (Ausschnitt):
-                      </Typography>
-                      <Paper 
-                        elevation={1} 
-                        sx={{ 
-                          p: 2,
-                          background: 'none',
-                          border: (theme) => `1px solid ${
-                            theme.palette.mode === 'dark' 
-                              ? 'rgba(255,255,255,0.1)' 
-                              : 'rgba(0,0,0,0.1)'
-                          }`,
+                            0.3
+                          )}`,
+                        }}
+                      />
+                      <Box
+                        sx={{
+                          top: 0,
+                          left: 0,
+                          bottom: 0,
+                          right: 0,
+                          position: 'absolute',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                         }}
                       >
                         <Typography 
-                          variant="body2" 
-                          color="text.secondary" 
+                          variant="h6" 
+                          component="div" 
                           sx={{ 
-                            whiteSpace: 'pre-line',
-                            fontFamily: 'monospace',
+                            color: results.overall_score > 70 ? 'success.main' : 
+                                   results.overall_score > 40 ? 'warning.main' : 'error.main',
+                            fontWeight: 'bold',
                           }}
                         >
-                          {results.cv_text}
+                          {`${Math.round(results.overall_score)}%`}
                         </Typography>
-                      </Paper>
+                      </Box>
+                    </Box>
+                    <Box>
+                      <Typography variant="h5" sx={{ color: 'primary.main', mb: 0.5 }}>
+                        Gesamtbewertung
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Übereinstimmung mit dem Anforderungsprofil
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  <Typography 
+                    variant="body1" 
+                    paragraph 
+                    sx={{ 
+                      whiteSpace: 'pre-line',
+                      backgroundColor: (theme) => alpha(
+                        theme.palette.background.paper,
+                        theme.palette.mode === 'dark' ? 0.1 : 0.7
+                      ),
+                      p: 2,
+                      borderRadius: 1,
+                      border: 1,
+                      borderColor: 'divider',
+                      boxShadow: (theme) => `0 0 20px ${alpha(theme.palette.primary.main, 0.1)}`,
+                    }}
+                  >
+                    {results.summary}
+                  </Typography>
+
+                  {results.key_strengths && results.key_strengths.length > 0 && (
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="subtitle1" gutterBottom color="primary.main">
+                        Besondere Stärken:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2 }}>
+                        {results.key_strengths.map((strength, index) => (
+                          <Chip
+                            key={index}
+                            label={strength}
+                            color="success"
+                            variant="outlined"
+                            sx={{ 
+                              fontSize: '0.9rem', 
+                              py: 0.5,
+                              background: 'none',
+                              border: (theme) => `1px solid ${
+                                theme.palette.mode === 'dark' 
+                                  ? 'rgba(255,255,255,0.1)' 
+                                  : 'rgba(0,0,0,0.1)'
+                              }`,
+                            }}
+                          />
+                        ))}
+                      </Box>
                     </Box>
                   )}
-                </>
-              )}
-            </Box>
-          )}
-        </Paper>
+
+                  {results.improvement_areas && results.improvement_areas.length > 0 && (
+                    <Box sx={{ mt: 3 }}>
+                      <Typography variant="subtitle1" gutterBottom color="secondary.main">
+                        Entwicklungspotenzial:
+                      </Typography>
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                        {results.improvement_areas.map((area, index) => (
+                          <Chip
+                            key={index}
+                            label={area}
+                            color="secondary"
+                            variant="outlined"
+                            sx={{ 
+                              fontSize: '0.9rem', 
+                              py: 0.5,
+                              background: 'none',
+                              border: (theme) => `1px solid ${
+                                theme.palette.mode === 'dark' 
+                                  ? 'rgba(255,255,255,0.1)' 
+                                  : 'rgba(0,0,0,0.1)'
+                              }`,
+                            }}
+                          />
+                        ))}
+                      </Box>
+                    </Box>
+                  )}
+                </Paper>
+
+                {results.requirement_matches && results.requirement_matches.length > 0 && (
+                  <>
+                    <Typography variant="h6" gutterBottom color="primary.main">
+                      Detaillierte Analyse der Anforderungen:
+                    </Typography>
+                    <List>
+                      {results.requirement_matches.map((match, index) => (
+                        <ListItem key={index} sx={{ px: 0, mb: 2 }}>
+                          <Paper 
+                            elevation={1} 
+                            sx={{ 
+                              p: 2, 
+                              width: '100%',
+                              background: 'none',
+                              border: (theme) => `1px solid ${
+                                theme.palette.mode === 'dark' 
+                                  ? 'rgba(255,255,255,0.1)' 
+                                  : 'rgba(0,0,0,0.1)'
+                              }`,
+                              transition: 'transform 0.2s',
+                              '&:hover': {
+                                transform: 'translateY(-2px)',
+                              },
+                            }}
+                          >
+                            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                              <Typography 
+                                variant="subtitle2" 
+                                sx={{ 
+                                  flex: 1,
+                                  color: 'text.primary',
+                                  fontWeight: 500,
+                                }}
+                              >
+                                {match.requirement}
+                              </Typography>
+                              <Chip
+                                label={`${match.match_percentage}%`}
+                                color={match.match_percentage > 70 ? 'success' : 
+                                      match.match_percentage > 40 ? 'warning' : 'error'}
+                                sx={{ 
+                                  ml: 2,
+                                  fontWeight: 'bold',
+                                  color: (theme) => theme.palette.mode === 'dark' ? '#ffffff' : '#000000',
+                                  backgroundColor: (theme) => {
+                                    const isLight = theme.palette.mode === 'light';
+                                    if (match.match_percentage > 70) {
+                                      return isLight ? alpha('#2e7d32', 0.15) : alpha('#2e7d32', 0.35);
+                                    } else if (match.match_percentage > 40) {
+                                      return isLight ? alpha('#ed6c02', 0.15) : alpha('#ed6c02', 0.35);
+                                    } else {
+                                      return isLight ? alpha('#d32f2f', 0.15) : alpha('#d32f2f', 0.35);
+                                    }
+                                  },
+                                  '& .MuiChip-label': {
+                                    color: (theme) => {
+                                      const isLight = theme.palette.mode === 'light';
+                                      if (match.match_percentage > 70) {
+                                        return isLight ? '#1b5e20' : '#81c784';
+                                      } else if (match.match_percentage > 40) {
+                                        return isLight ? '#e65100' : '#ffb74d';
+                                      } else {
+                                        return isLight ? '#c62828' : '#ef9a9a';
+                                      }
+                                    },
+                                  },
+                                }}
+                              />
+                            </Box>
+                            <Typography 
+                              variant="body2" 
+                              sx={{ 
+                                color: 'text.secondary',
+                                whiteSpace: 'pre-line',
+                                p: 1.5,
+                                borderRadius: 1,
+                                border: '1px solid',
+                                borderColor: 'divider',
+                              }}
+                            >
+                              {match.explanation}
+                            </Typography>
+                          </Paper>
+                        </ListItem>
+                      ))}
+                    </List>
+                  </>
+                )}
+
+                {results.cv_text && (
+                  <Box sx={{ mt: 4 }}>
+                    <Typography variant="subtitle1" gutterBottom color="text.secondary">
+                      Extrahierter Text (Ausschnitt):
+                    </Typography>
+                    <Paper 
+                      elevation={1} 
+                      sx={{ 
+                        p: 2,
+                        background: 'none',
+                        border: (theme) => `1px solid ${
+                          theme.palette.mode === 'dark' 
+                            ? 'rgba(255,255,255,0.1)' 
+                            : 'rgba(0,0,0,0.1)'
+                        }`,
+                      }}
+                    >
+                      <Typography 
+                        variant="body2" 
+                        color="text.secondary" 
+                        sx={{ 
+                          whiteSpace: 'pre-line',
+                          fontFamily: 'monospace',
+                        }}
+                      >
+                        {results.cv_text}
+                      </Typography>
+                    </Paper>
+                  </Box>
+                )}
+              </>
+            )}
+          </Paper>
+        )}
       </Container>
     </ThemeProvider>
   );
