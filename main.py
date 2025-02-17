@@ -18,11 +18,11 @@ load_dotenv()
 
 # Initialize OpenRouter client
 client = OpenAI(
+    api_key=os.getenv("OPENAI_API_KEY"),
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
     default_headers={
-        "HTTP-Referer": "http://localhost:3000",  # Required for billing
-        "X-Title": "CV Parser",  # Optional, for billing
+        "HTTP-Referer": "http://localhost:3000",
+        "X-Title": "CV Parser",
         "Content-Type": "application/json"
     }
 )
@@ -87,17 +87,7 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
     "summary": "<Ausführliche Gesamtbeurteilung des Kandidaten, inkl. Stärken und Schwächen>",
     "key_strengths": ["<Stärke 1>", "<Stärke 2>", ...],
     "improvement_areas": ["<Verbesserungsbereich 1>", "<Verbesserungsbereich 2>", ...]
-}}
-
-Wichtige Analysepunkte:
-1. Bewerte die direkte Übereinstimmung mit den Anforderungen
-2. Berücksichtige verwandte oder übertragbare Fähigkeiten
-3. Bewerte das Niveau der vorhandenen Expertise
-4. Analysiere die Aktualität der relevanten Erfahrungen
-5. Gib konkrete Verbesserungsvorschläge
-6. Hebe besondere Stärken hervor
-
-Stelle sicher, dass die Antwort valides JSON ist und alle Textfelder korrekt escaped sind."""
+}}"""
 
         try:
             print("\n=== Making OpenRouter API Call ===")

@@ -56,39 +56,39 @@ const jobRoleRequirements = {
 };
 
 // Remove particles config and keep only the theme configuration
-const getDesignTokens = () => ({
+const getDesignTokens = (mode) => ({
   palette: {
-    mode: 'dark',
+    mode,
     primary: {
       main: '#9c27b0',
       light: '#ba68c8',
       dark: '#7b1fa2',
     },
     secondary: {
-      main: '#ff9800',
-      light: '#ffb74d',
-      dark: '#f57c00',
+      main: '#4caf50',
+      light: '#81c784',
+      dark: '#388e3c',
     },
     background: {
-      default: '#000000',
-      paper: 'rgba(20, 20, 20, 0.8)',
+      default: mode === 'light' ? '#ffffff' : '#1a1a1a',
+      paper: mode === 'light' ? '#ffffff' : '#242424',
     },
     text: {
-      primary: '#ffffff',
-      secondary: 'rgba(255, 255, 255, 0.7)',
+      primary: mode === 'light' ? '#000000' : '#ffffff',
+      secondary: mode === 'light' ? 'rgba(0, 0, 0, 0.7)' : 'rgba(255, 255, 255, 0.7)',
     },
   },
   typography: {
     fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
       fontWeight: 300,
-      color: '#ffffff',
+      color: mode === 'light' ? '#000000' : '#ffffff',
       letterSpacing: '0.2em',
       textTransform: 'uppercase',
     },
     h6: {
       fontWeight: 300,
-      color: '#ff3333',
+      color: '#9c27b0',
       letterSpacing: '0.1em',
     },
   },
@@ -96,14 +96,20 @@ const getDesignTokens = () => ({
     MuiPaper: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
           backgroundImage: 'none',
-          backgroundColor: 'rgba(20, 20, 20, 0.8)',
-          backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(156, 39, 176, 0.1)',
+          backgroundColor: mode === 'light' ? '#ffffff' : '#242424',
+          backdropFilter: 'none',
+          border: mode === 'light' 
+            ? '1px solid rgba(0, 0, 0, 0.1)'
+            : '1px solid rgba(255, 255, 255, 0.1)',
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
-            border: '1px solid rgba(156, 39, 176, 0.3)',
+            border: mode === 'light'
+              ? '1px solid rgba(0, 0, 0, 0.2)'
+              : '1px solid rgba(255, 255, 255, 0.15)',
+            boxShadow: mode === 'light'
+              ? 'none'
+              : '0 0 20px rgba(0, 0, 0, 0.2)',
           },
         },
       },
@@ -111,29 +117,28 @@ const getDesignTokens = () => ({
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          textTransform: 'uppercase',
-          fontWeight: 300,
-          letterSpacing: '0.1em',
-          padding: '12px 24px',
+          borderRadius: 4,
+          textTransform: 'none',
+          fontWeight: 500,
+          letterSpacing: '0.05em',
+          padding: '8px 16px',
           transition: 'all 0.3s ease-in-out',
           '&:hover': {
             transform: 'translateY(-2px)',
-            boxShadow: '0 4px 20px rgba(156, 39, 176, 0.3)',
+            boxShadow: mode === 'light' 
+              ? '0 4px 20px rgba(0, 0, 0, 0.1)'
+              : '0 4px 20px rgba(156, 39, 176, 0.4)',
           },
         },
         contained: {
-          background: 'linear-gradient(45deg, #9c27b0 30%, #ff9800 90%)',
+          background: mode === 'light'
+            ? '#9c27b0'
+            : 'linear-gradient(45deg, #9c27b0 30%, #ba68c8 90%)',
+          color: '#ffffff',
           '&:hover': {
-            background: 'linear-gradient(45deg, #ff9800 30%, #ffb74d 90%)',
-          },
-        },
-        outlined: {
-          borderColor: '#9c27b0',
-          color: '#9c27b0',
-          '&:hover': {
-            borderColor: '#ba68c8',
-            backgroundColor: 'rgba(156, 39, 176, 0.1)',
+            background: mode === 'light'
+              ? '#7b1fa2'
+              : 'linear-gradient(45deg, #ba68c8 30%, #9c27b0 90%)',
           },
         },
       },
@@ -142,16 +147,22 @@ const getDesignTokens = () => ({
       styleOverrides: {
         root: {
           '& .MuiOutlinedInput-root': {
-            borderRadius: 0,
+            backgroundColor: mode === 'light' ? 'transparent' : 'rgba(255, 255, 255, 0.03)',
             '& fieldset': {
-              borderColor: 'rgba(156, 39, 176, 0.3)',
+              borderColor: mode === 'light' ? 'rgba(0, 0, 0, 0.23)' : 'rgba(255, 255, 255, 0.15)',
             },
             '&:hover fieldset': {
-              borderColor: 'rgba(156, 39, 176, 0.5)',
+              borderColor: mode === 'light' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.25)',
             },
             '&.Mui-focused fieldset': {
               borderColor: '#9c27b0',
             },
+          },
+          '& .MuiInputLabel-root': {
+            color: mode === 'light' ? 'rgba(0, 0, 0, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+          },
+          '& .MuiInputBase-input': {
+            color: mode === 'light' ? '#000000' : '#ffffff',
           },
         },
       },
@@ -159,54 +170,20 @@ const getDesignTokens = () => ({
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 0,
-          backgroundColor: 'rgba(20, 20, 20, 0.8)',
-          border: '1px solid rgba(156, 39, 176, 0.3)',
-          color: '#ffffff',
+          backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.08)' : 'rgba(255, 255, 255, 0.05)',
+          border: mode === 'light' ? 'none' : '1px solid rgba(255, 255, 255, 0.1)',
+          color: mode === 'light' ? 'rgba(0, 0, 0, 0.87)' : '#ffffff',
           '&:hover': {
-            backgroundColor: 'rgba(156, 39, 176, 0.1)',
+            backgroundColor: mode === 'light' ? 'rgba(0, 0, 0, 0.12)' : 'rgba(255, 255, 255, 0.08)',
           },
-        },
-        outlined: {
-          backgroundColor: 'transparent',
         },
       },
     },
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          backgroundColor: '#000000',
-          backgroundImage: `
-            radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.1) 0%, transparent 50%),
-            linear-gradient(rgba(156, 39, 176, 0.05) 2px, transparent 2px),
-            linear-gradient(90deg, rgba(156, 39, 176, 0.05) 2px, transparent 2px)
-          `,
-          backgroundSize: '100% 100%, 50px 50px, 50px 50px',
-          backgroundPosition: '0 0, 0 0, 0 0',
-          '&::before': {
-            content: '""',
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            background: 'radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.1) 0%, transparent 50%)',
-            animation: 'pulse 4s ease-in-out infinite',
-          },
-        },
-        '@keyframes pulse': {
-          '0%': {
-            opacity: 0.5,
-            transform: 'scale(1)',
-          },
-          '50%': {
-            opacity: 1,
-            transform: 'scale(1.2)',
-          },
-          '100%': {
-            opacity: 0.5,
-            transform: 'scale(1)',
-          },
+          backgroundColor: mode === 'light' ? '#ffffff' : '#1a1a1a',
+          backgroundImage: 'none',
         },
       },
     },
@@ -231,13 +208,19 @@ function JobRoleTab({ value, index, children }) {
 }
 
 function App() {
-  const theme = React.useMemo(() => createTheme(getDesignTokens()), []);
+  const [mode, setMode] = useState('light');
+  const theme = React.useMemo(() => createTheme(getDesignTokens(mode)), [mode]);
   const [file, setFile] = useState(null);
   const [requirements, setRequirements] = useState(['']);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState(null);
   const [error, setError] = useState('');
   const [selectedTab, setSelectedTab] = useState(0);
+  const [selectedRole, setSelectedRole] = useState('developer');
+
+  const toggleColorMode = () => {
+    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
+  };
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -333,14 +316,21 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Container maxWidth="md" sx={{ py: 4 }}>
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+          <IconButton onClick={toggleColorMode} color="inherit">
+            {mode === 'dark' ? <LightMode /> : <DarkMode />}
+          </IconButton>
+        </Box>
         <Paper 
           elevation={3} 
           sx={{ 
             p: 4,
             position: 'relative',
-            backgroundColor: 'rgba(20, 20, 20, 0.8)',
-            backdropFilter: 'blur(10px)',
-            border: '1px solid rgba(156, 39, 176, 0.1)',
+            backgroundColor: mode === 'light' ? '#ffffff' : 'rgba(20, 20, 20, 0.8)',
+            backdropFilter: mode === 'light' ? 'none' : 'blur(10px)',
+            border: mode === 'light' 
+              ? '1px solid rgba(0, 0, 0, 0.1)'
+              : '1px solid rgba(156, 39, 176, 0.1)',
             '&::before': {
               content: '""',
               position: 'absolute',
@@ -348,19 +338,9 @@ function App() {
               left: 0,
               right: 0,
               height: '1px',
-              background: 'linear-gradient(90deg, transparent, rgba(156, 39, 176, 0.5), transparent)',
-              animation: 'glow 2s ease-in-out infinite',
-            },
-            '&::after': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'radial-gradient(circle at 50% 50%, rgba(156, 39, 176, 0.1) 0%, transparent 50%)',
-              animation: 'pulse 4s ease-in-out infinite',
-              pointerEvents: 'none',
+              background: mode === 'light'
+                ? 'linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent)'
+                : 'linear-gradient(90deg, transparent, rgba(156, 39, 176, 0.5), transparent)',
             },
           }}
         >
@@ -999,10 +979,7 @@ function App() {
                     sx={{ 
                       p: 3, 
                       mb: 3,
-                      background: (theme) => theme.palette.mode === 'dark'
-                        ? 'linear-gradient(45deg, rgba(76,175,80,0.1) 0%, rgba(156,39,176,0.1) 100%)'
-                        : 'linear-gradient(45deg, rgba(46,125,50,0.05) 0%, rgba(123,31,162,0.05) 100%)',
-                      backdropFilter: 'blur(10px)',
+                      background: 'none',
                       border: (theme) => `1px solid ${
                         theme.palette.mode === 'dark' 
                           ? 'rgba(255,255,255,0.1)' 
@@ -1138,7 +1115,12 @@ function App() {
                               sx={{ 
                                 fontSize: '0.9rem', 
                                 py: 0.5,
-                                backgroundColor: 'rgba(255,255,255,0.9)',
+                                background: 'none',
+                                border: (theme) => `1px solid ${
+                                  theme.palette.mode === 'dark' 
+                                    ? 'rgba(255,255,255,0.1)' 
+                                    : 'rgba(0,0,0,0.1)'
+                                }`,
                               }}
                             />
                           ))}
@@ -1161,7 +1143,12 @@ function App() {
                               sx={{ 
                                 fontSize: '0.9rem', 
                                 py: 0.5,
-                                backgroundColor: 'rgba(255,255,255,0.9)',
+                                background: 'none',
+                                border: (theme) => `1px solid ${
+                                  theme.palette.mode === 'dark' 
+                                    ? 'rgba(255,255,255,0.1)' 
+                                    : 'rgba(0,0,0,0.1)'
+                                }`,
                               }}
                             />
                           ))}
@@ -1183,7 +1170,12 @@ function App() {
                               sx={{ 
                                 p: 2, 
                                 width: '100%',
-                                background: 'linear-gradient(45deg, rgba(46,125,50,0.02) 0%, rgba(123,31,162,0.02) 100%)',
+                                background: 'none',
+                                border: (theme) => `1px solid ${
+                                  theme.palette.mode === 'dark' 
+                                    ? 'rgba(255,255,255,0.1)' 
+                                    : 'rgba(0,0,0,0.1)'
+                                }`,
                                 transition: 'transform 0.2s',
                                 '&:hover': {
                                   transform: 'translateY(-2px)',
@@ -1219,7 +1211,6 @@ function App() {
                                 sx={{ 
                                   color: 'text.secondary',
                                   whiteSpace: 'pre-line',
-                                  backgroundColor: 'rgba(255,255,255,0.7)',
                                   p: 1.5,
                                   borderRadius: 1,
                                   border: '1px solid',
@@ -1244,7 +1235,12 @@ function App() {
                         elevation={1} 
                         sx={{ 
                           p: 2,
-                          backgroundColor: 'rgba(0,0,0,0.02)',
+                          background: 'none',
+                          border: (theme) => `1px solid ${
+                            theme.palette.mode === 'dark' 
+                              ? 'rgba(255,255,255,0.1)' 
+                              : 'rgba(0,0,0,0.1)'
+                          }`,
                         }}
                       >
                         <Typography 
