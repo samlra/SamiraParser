@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}Startseite{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-4 fw-bold mb-3">Lebenslauf-Analyse und Bewertungssystem</h1>
+    <p class="lead text-muted">Laden Sie Ihren Lebenslauf hoch und geben Sie die Stellenanforderungen ein, um eine sofortige Übereinstimmungsanalyse zu erhalten</p>
+</div>
+
+<div class="card mb-5">
+    <div class="card-body p-4">
+        <h5 class="card-title mb-4">Lebenslauf und Anforderungen hochladen</h5>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="mb-4">
+                <label for="cv" class="form-label fw-medium">Lebenslauf hochladen (PDF oder DOCX)</label>
+                <div class="input-group">
+                    <input type="file" class="form-control" id="cv" name="cv" accept=".pdf,.docx" required>
+                    <span class="input-group-text bg-light">
+                        <i class="fas fa-file-upload"></i>
+                    </span>
+                </div>
+                <small class="text-muted mt-1">Maximale Dateigröße: 16MB</small>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-medium">Stellenanforderungen</label>
+                <div id="requirementsList">
+                    <div class="requirement-item input-group">
+                        <span class="input-group-text bg-light">
+                            <i class="fas fa-tasks"></i>
+                        </span>
+                        <input type="text" class="form-control" name="requirements[]" placeholder="Geben Sie eine Stellenanforderung ein" required>
+                        <button type="button" class="btn btn-outline-danger" onclick="removeRequirement(this)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary mt-3" onclick="addRequirement()">
+                    <i class="fas fa-plus me-2"></i>Anforderung hinzufügen
+                </button>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-lg w-100">
+                <i class="fas fa-search me-2"></i>Lebenslauf analysieren
+            </button>
+        </form>
+    </div>
+</div>
+
+<div id="results" class="score-card">
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <h3 class="mb-0">Analyseergebnisse</h3>
+        <span class="badge bg-primary px-3 py-2">Übereinstimmungsanalyse</span>
+    </div>
+    
+    <div class="mb-5">
+        <h5 class="mb-3">Gesamtübereinstimmung</h5>
+        <div class="progress mb-3">
+            <div id="overallScore" class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+        <p class="text-center fw-bold fs-4 mb-0" id="overallScoreText">Ergebnis: 0%</p>
+    </div>
+
+    <div>
+        <h5 class="mb-3">Einzelne Anforderungsergebnisse</h5>
+        <div id="requirementScores"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addRequirement() {
+    const requirementsList = document.getElementById('requirementsList');
+    const newRequirement = document.createElement('div');
+    newRequirement.className = 'requirement-item input-group mt-2';
+    newRequirement.innerHTML = `
+        <span class="input-group-text bg-light">
+            <i class="fas fa-tasks"></i>
+        </span>
+        <input type="text" class="form-control" name="requirements[]" placeholder="Geben Sie eine Stellenanforderung ein" required>
+        <button type="button" class="btn btn-outline-danger" onclick="removeRequirement(this)">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    requirementsList.appendChild(newRequirement);
+    newRequirement.querySelector('input').focus();
+}
+
+function removeRequirement(button) {
+    const requirementsList = document.getElementById('requirementsList');
+    if (requirementsList.children.length > 1) {
+        button.closest('.requirement-item').remove();
+    }
+}
+
+document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const submitButton = e.target.querySelector('button[type="submit"]');
+    const originalText = submitButton.innerHTML;
+    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Analysiere...';
+    submitButton.disabled = true;
+    
+    try {
+        const formData = new FormData(e.target);
+        const response = await fetch('/upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+            displayResults(data);
+        } else {
+            // Zeige Fehlermeldung in einem schönen Alert an
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+            errorDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${data.error || 'Ein unerwarteter Fehler ist aufgetreten'}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.row'));
+            
+            // Scrolle zum Fehler
+            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    } catch (error) {
+        // Zeige technische Fehler auch schön an
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'alert alert-danger alert-dismissible fade show';
+        errorDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Technischer Fehler: ${error.message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.container').insertBefore(errorDiv, document.querySelector('.row'));
+        errorDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } finally {
+        submitButton.innerHTML = originalText;
+        submitButton.disabled = false;
+    }
+});
+
+function displayResults(data) {
+    const results = document.getElementById('results');
+    results.style.display = 'block';
+    
+    // Zu den Ergebnissen scrollen
+    results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Gesamtergebnis mit Animation aktualisieren
+    const overallScore = Math.round(data.overall_score);
+    const overallScoreBar = document.getElementById('overallScore');
+    const overallScoreText = document.getElementById('overallScoreText');
+    
+    overallScoreBar.style.width = '0%';
+    setTimeout(() => {
+        overallScoreBar.style.width = `${overallScore}%`;
+        overallScoreBar.innerHTML = `<span class="px-2">${overallScore}%</span>`;
+        overallScoreText.textContent = `Ergebnis: ${overallScore}%`;
+    }, 100);
+    
+    // Anforderungsergebnisse aktualisieren
+    const requirementScores = document.getElementById('requirementScores');
+    requirementScores.innerHTML = '';
+    
+    data.requirement_scores.forEach((score, index) => {
+        const scoreElement = document.createElement('div');
+        scoreElement.className = 'requirement-score';
+        const roundedScore = Math.round(score.score);
+        
+        scoreElement.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <p class="mb-0 fw-medium">${score.requirement}</p>
+                <span class="badge bg-secondary">${roundedScore}%</span>
+            </div>
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" 
+                     style="width: 0%" 
+                     aria-valuenow="${roundedScore}" 
+                     aria-valuemin="0" 
+                     aria-valuemax="100">
+                </div>
+            </div>
+        `;
+        
+        requirementScores.appendChild(scoreElement);
+        
+        // Fortschrittsbalken animieren
+        setTimeout(() => {
+            scoreElement.querySelector('.progress-bar').style.width = `${roundedScore}%`;
+        }, 100 * (index + 1));
+    });
+}
+</script>
+{% endblock %} 
