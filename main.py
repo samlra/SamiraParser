@@ -7,8 +7,25 @@ import io
 import spacy
 import numpy as np
 import json
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
 
 app = FastAPI()
+
+# Load environment variables
+load_dotenv()
+
+# Initialize OpenRouter client
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+    default_headers={
+        "HTTP-Referer": "http://localhost:3000",  # Required for billing
+        "X-Title": "CV Parser",  # Optional, for billing
+        "Content-Type": "application/json"
+    }
+)
 
 # Load the German language model
 try:
@@ -39,6 +56,118 @@ def extract_text_from_pdf(file_content: bytes) -> str:
         return text.lower()
     except Exception as e:
         raise HTTPException(status_code=400, detail=f"Error extracting text from PDF: {str(e)}")
+
+def get_ai_analysis(cv_text: str, requirements: List[dict]) -> dict:
+    try:
+        print(f"\n=== Starting AI Analysis ===")
+        print(f"CV Text length: {len(cv_text)} characters")
+        
+        # Prepare the prompt for AI analysis
+        requirements_text = "\n".join([f"- {req['text']}" for req in requirements])
+        
+        # Create a more structured prompt in German
+        prompt = f"""Du bist ein KI-Assistent für CV-Analyse. Analysiere den folgenden Lebenslauf anhand der Stellenanforderungen.
+
+Lebenslauf Text:
+{cv_text}
+
+Stellenanforderungen:
+{requirements_text}
+
+Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf Deutsch):
+{{
+    "requirement_matches": [
+        {{
+            "requirement": "<Anforderungstext>",
+            "match_percentage": <Zahl zwischen 0-100>,
+            "explanation": "<Detaillierte Erklärung, warum der Kandidat die Anforderung erfüllt oder nicht erfüllt>"
+        }}
+    ],
+    "overall_score": <Gesamtbewertung 0-100>,
+    "summary": "<Ausführliche Gesamtbeurteilung des Kandidaten, inkl. Stärken und Schwächen>",
+    "key_strengths": ["<Stärke 1>", "<Stärke 2>", ...],
+    "improvement_areas": ["<Verbesserungsbereich 1>", "<Verbesserungsbereich 2>", ...]
+}}
+
+Wichtige Analysepunkte:
+1. Bewerte die direkte Übereinstimmung mit den Anforderungen
+2. Berücksichtige verwandte oder übertragbare Fähigkeiten
+3. Bewerte das Niveau der vorhandenen Expertise
+4. Analysiere die Aktualität der relevanten Erfahrungen
+5. Gib konkrete Verbesserungsvorschläge
+6. Hebe besondere Stärken hervor
+
+Stelle sicher, dass die Antwort valides JSON ist und alle Textfelder korrekt escaped sind."""
+
+        try:
+            print("\n=== Making OpenRouter API Call ===")
+            
+            completion = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "Du bist ein deutscher CV-Analyse-Assistent. Antworte stets auf Deutsch und im korrekten JSON-Format."
+                    },
+                    {
+                        "role": "user",
+                        "content": prompt
+                    }
+                ],
+                temperature=0.7,
+                max_tokens=2000
+            )
+            
+            if not completion.choices or not completion.choices[0].message:
+                raise ValueError("Keine gültige Antwort von der API erhalten")
+            
+            response_content = completion.choices[0].message.content
+            print("\nReceived response from API:", response_content[:200])
+            
+            try:
+                ai_response = json.loads(response_content)
+                
+                required_fields = ["requirement_matches", "overall_score", "summary", "key_strengths", "improvement_areas"]
+                for field in required_fields:
+                    if field not in ai_response:
+                        ai_response[field] = [] if field in ["requirement_matches", "key_strengths", "improvement_areas"] else (0 if field == "overall_score" else "Keine Analyse verfügbar")
+                
+                return ai_response
+                
+            except json.JSONDecodeError as e:
+                print(f"\nJSON Parsing Error: {str(e)}")
+                print("Raw response:", response_content)
+                
+                return {
+                    "requirement_matches": [],
+                    "overall_score": 0,
+                    "summary": "Fehler bei der Analyse der AI-Antwort. Bitte versuchen Sie es erneut.",
+                    "key_strengths": [],
+                    "improvement_areas": []
+                }
+                
+        except Exception as api_error:
+            print(f"\nAPI Error: {str(api_error)}")
+            if hasattr(api_error, 'response'):
+                print("API Response:", api_error.response)
+            
+            return {
+                "requirement_matches": [],
+                "overall_score": 0,
+                "summary": f"API-Fehler: {str(api_error)}",
+                "key_strengths": [],
+                "improvement_areas": []
+            }
+            
+    except Exception as e:
+        print(f"\nGeneral Error: {str(e)}")
+        return {
+            "requirement_matches": [],
+            "overall_score": 0,
+            "summary": f"Analysefehler: {str(e)}",
+            "key_strengths": [],
+            "improvement_areas": []
+        }
 
 def calculate_semantic_similarity(cv_text: str, requirement: str) -> float:
     try:
@@ -87,23 +216,13 @@ async def analyze_cv(
         if not cv_text.strip():
             raise HTTPException(status_code=400, detail="Could not extract text from PDF")
         
-        # Calculate similarity scores for each requirement
-        scores = []
-        for req in requirements_list:
-            score = calculate_semantic_similarity(cv_text, req['text'])
-            scores.append({
-                "requirement": req['text'],
-                "score": round(score, 1)
-            })
+        # Get AI analysis
+        results = get_ai_analysis(cv_text, requirements_list)
         
-        # Calculate overall score (average of all scores)
-        overall_score = round(np.mean([s["score"] for s in scores]), 1) if scores else 0.0
+        # Add the CV text to the response
+        results["cv_text"] = cv_text[:200] + "..." if len(cv_text) > 200 else cv_text
         
-        return {
-            "overall_score": overall_score,
-            "requirement_scores": scores,
-            "cv_text": cv_text[:200] + "..." if len(cv_text) > 200 else cv_text
-        }
+        return results
         
     except json.JSONDecodeError:
         raise HTTPException(status_code=400, detail="Invalid JSON format for requirements")
