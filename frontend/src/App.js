@@ -165,7 +165,6 @@ const getDesignTokens = (mode) => ({
           }`,
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
           '&:hover': {
-            transform: 'translateY(-4px)',
             boxShadow: (theme) => `0 16px 48px ${
               theme.palette.mode === 'light'
                 ? 'rgba(30, 132, 73, 0.12)'
@@ -430,7 +429,6 @@ function App() {
                 borderRadius: 3,
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  transform: 'translateY(-4px)',
                   boxShadow: (theme) => `0 16px 48px ${
                     theme.palette.mode === 'light'
                       ? 'rgba(30, 132, 73, 0.12)'
@@ -515,7 +513,6 @@ function App() {
                 borderRadius: 3,
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 '&:hover': {
-                  transform: 'translateY(-4px)',
                   boxShadow: (theme) => `0 16px 48px ${
                     theme.palette.mode === 'light'
                       ? 'rgba(30, 132, 73, 0.12)'
@@ -647,9 +644,13 @@ function App() {
                         ? 'rgba(255,255,255,0.1)' 
                         : 'rgba(0,0,0,0.1)'
                     }`,
-                    transition: 'transform 0.3s ease-in-out',
+                    transition: 'all 0.3s ease-in-out',
                     '&:hover': {
-                      transform: 'translateY(-4px)',
+                      boxShadow: (theme) => `0 16px 48px ${
+                        theme.palette.mode === 'light'
+                          ? 'rgba(30, 132, 73, 0.12)'
+                          : 'rgba(39, 174, 96, 0.12)'
+                      }`,
                     },
                   }}
                 >
@@ -659,6 +660,7 @@ function App() {
                         position: 'relative', 
                         display: 'inline-flex', 
                         mr: 3,
+                        background: 'transparent',
                         '&::after': {
                           content: '""',
                           position: 'absolute',
@@ -706,6 +708,8 @@ function App() {
                                 : theme.palette.error.main,
                             0.3
                           )}`,
+                          background: 'transparent',
+                          borderRadius: '50%',
                         }}
                       />
                       <Box
@@ -718,15 +722,20 @@ function App() {
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
+                          background: 'transparent',
                         }}
                       >
                         <Typography 
                           variant="h6" 
                           component="div" 
                           sx={{ 
-                            color: results.overall_score > 70 ? 'success.main' : 
-                                   results.overall_score > 40 ? 'warning.main' : 'error.main',
+                            color: (theme) => results.overall_score > 70 
+                              ? theme.palette.mode === 'light' ? '#1b5e20' : '#81c784'
+                              : results.overall_score > 40 
+                                ? theme.palette.mode === 'light' ? '#e65100' : '#ffb74d'
+                                : theme.palette.mode === 'light' ? '#c62828' : '#ef9a9a',
                             fontWeight: 'bold',
+                            textShadow: '0 1px 2px rgba(0,0,0,0.1)',
                           }}
                         >
                           {`${Math.round(results.overall_score)}%`}
@@ -838,9 +847,13 @@ function App() {
                                   ? 'rgba(255,255,255,0.1)' 
                                   : 'rgba(0,0,0,0.1)'
                               }`,
-                              transition: 'transform 0.2s',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                               '&:hover': {
-                                transform: 'translateY(-2px)',
+                                boxShadow: (theme) => `0 8px 24px ${
+                                  theme.palette.mode === 'light'
+                                    ? 'rgba(30, 132, 73, 0.12)'
+                                    : 'rgba(39, 174, 96, 0.12)'
+                                }`,
                               },
                             }}
                           >
