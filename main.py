@@ -7,7 +7,7 @@ import io
 import spacy
 import numpy as np
 import json
-from openai import OpenAI
+import openai
 import os
 from dotenv import load_dotenv
 
@@ -17,15 +17,8 @@ app = FastAPI()
 load_dotenv()
 
 # Initialize OpenRouter client
-client = OpenAI(
-    api_key=os.getenv("OPENAI_API_KEY"),
-    base_url="https://openrouter.ai/api/v1",
-    default_headers={
-        "HTTP-Referer": "http://localhost:3000",
-        "X-Title": "CV Parser",
-        "Content-Type": "application/json"
-    }
-)
+openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_base = "https://openrouter.ai/api/v1"
 
 # Load the German language model
 try:
@@ -92,7 +85,7 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
         try:
             print("\n=== Making OpenRouter API Call ===")
             
-            completion = client.chat.completions.create(
+            completion = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",
                 messages=[
                     {
@@ -105,7 +98,11 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
                     }
                 ],
                 temperature=0.7,
-                max_tokens=2000
+                max_tokens=2000,
+                headers={
+                    "HTTP-Referer": "https://github.com/OpenRouterTeam/openrouter-python",
+                    "X-Title": "CV Parser"
+                }
             )
             
             if not completion.choices or not completion.choices[0].message:
