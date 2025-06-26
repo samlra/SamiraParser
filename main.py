@@ -10,6 +10,8 @@ import json
 import openai
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
+import re
 
 app = FastAPI()
 
@@ -17,8 +19,10 @@ app = FastAPI()
 load_dotenv()
 
 # Initialize OpenRouter client
-openai.api_key = os.getenv("OPENAI_API_KEY")
-openai.api_base = "https://openrouter.ai/api/v1"
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key="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",
+)
 
 # Load the German language model
 try:
@@ -85,8 +89,13 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
         try:
             print("\n=== Making OpenRouter API Call ===")
             
-            completion = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
+            completion = client.chat.completions.create(
+                extra_headers={
+                    "HTTP-Referer": "https://github.com/OpenRouterTeam/openrouter-python",
+                    "X-Title": "CV Parser"
+                },
+                extra_body={},
+                model="deepseek/deepseek-r1-0528:free",
                 messages=[
                     {
                         "role": "system",
@@ -98,11 +107,7 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
                     }
                 ],
                 temperature=0.7,
-                max_tokens=2000,
-                headers={
-                    "HTTP-Referer": "https://github.com/OpenRouterTeam/openrouter-python",
-                    "X-Title": "CV Parser"
-                }
+                max_tokens=2000
             )
             
             if not completion.choices or not completion.choices[0].message:
@@ -112,13 +117,21 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
             print("\nReceived response from API:", response_content[:200])
             
             try:
-                ai_response = json.loads(response_content)
-                
+                # Try to extract JSON from the response, even if wrapped in text or code block
+                # Remove code block markers if present
+                response_content_clean = re.sub(r'```json|```', '', response_content, flags=re.IGNORECASE).strip()
+                # Find the first '{' and last '}'
+                start = response_content_clean.find('{')
+                end = response_content_clean.rfind('}')
+                if start != -1 and end != -1 and end > start:
+                    json_str = response_content_clean[start:end+1]
+                else:
+                    json_str = response_content_clean
+                ai_response = json.loads(json_str)
                 required_fields = ["requirement_matches", "overall_score", "summary", "key_strengths", "improvement_areas"]
                 for field in required_fields:
                     if field not in ai_response:
                         ai_response[field] = [] if field in ["requirement_matches", "key_strengths", "improvement_areas"] else (0 if field == "overall_score" else "Keine Analyse verfügbar")
-                
                 return ai_response
                 
             except json.JSONDecodeError as e:

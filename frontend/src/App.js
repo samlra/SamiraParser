@@ -463,7 +463,7 @@ function App() {
                   fullWidth
                   size="large"
                 >
-                  SAP Projektleiter
+                  Business Consultant Energy & Utilities
                 </Button>
 
                 <Box sx={{ mt: 4 }}>
@@ -524,7 +524,7 @@ function App() {
               <Typography variant="h6" gutterBottom>
                 Stellenanforderungen für {selectedRole === 'developer' ? 'SAP Entwickler' : 
                                         selectedRole === 'consultant' ? 'SAP Consultant' : 
-                                        'SAP Projektleiter'}
+                                        'Business Consultant Energy & Utilities'}
               </Typography>
 
               <TextField
