@@ -21,7 +21,7 @@ load_dotenv()
 # Initialize OpenRouter client
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
-    api_key="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",
+    api_key=os.getenv("OPENAI_API_KEY"),
 )
 
 # Load the German language model
@@ -95,7 +95,7 @@ Bitte liefere eine detaillierte Analyse im folgenden JSON-Format (Antworten auf 
                     "X-Title": "CV Parser"
                 },
                 extra_body={},
-                model="deepseek/deepseek-r1-0528:free",
+                model="meta-llama/llama-4-maverick:free",
                 messages=[
                     {
                         "role": "system",
